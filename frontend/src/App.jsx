@@ -1,5 +1,5 @@
 import React from 'react';
-import { Routes, Route, Navigate } from 'react-router-dom';
+import { Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import { useAuth } from './context/AuthContext';
 import { Navbar } from './components/Navbar';
 import { ProtectedRoute } from './components/ProtectedRoute';
@@ -11,6 +11,7 @@ import { StoreOwnerDashboard } from './pages/StoreOwnerDashboard';
 
 export const App = () => {
   const { user, isAuthenticated, loading } = useAuth();
+  const location = useLocation();
 
   const getRootRedirect = () => {
     if (!isAuthenticated || !user) return <Navigate to="/login" replace />;
@@ -21,18 +22,23 @@ export const App = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-slate-50">
-        <div className="flex flex-col items-center gap-3 text-slate-500">
-          <div className="w-10 h-10 border-3 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
-          <p className="text-sm font-medium">Initializing platform...</p>
+      <div className="min-h-screen flex items-center justify-center bg-[#FAF9F6]">
+        <div className="flex flex-col items-center gap-2 text-[#8A8578]">
+          <div className="w-5 h-5 border-2 border-[#C9714F] border-t-transparent rounded-full animate-spin"></div>
+          <p className="text-xs">Initializing...</p>
         </div>
       </div>
     );
   }
 
+  // Determine if we should show the top navbar (only for customer stores view or public general view)
+  const isDashboardRoute = location.pathname.startsWith('/admin') || location.pathname.startsWith('/owner');
+  const isAuthRoute = location.pathname === '/login' || location.pathname === '/signup';
+  const showTopNav = !isDashboardRoute && !isAuthRoute;
+
   return (
-    <div className="min-h-screen flex flex-col bg-slate-50 text-slate-800 selection:bg-blue-500 selection:text-white">
-      <Navbar />
+    <div className="min-h-screen flex flex-col bg-[#FAF9F6] text-[#2B2924]">
+      {showTopNav && <Navbar />}
 
       <main className="flex-1">
         <Routes>
@@ -78,19 +84,21 @@ export const App = () => {
         </Routes>
       </main>
 
-      {/* Global Clean Footer */}
-      <footer className="border-t border-slate-200 bg-white/90 py-6 text-center text-xs text-slate-500 shadow-xs">
-        <div className="max-w-7xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-2">
-          <p>© 2026 Roxx Store Rating Platform. All rights reserved.</p>
-          <div className="flex items-center gap-4 text-slate-400">
-            <span>Secure Authentication</span>
-            <span>•</span>
-            <span>Role-Based Permissions</span>
-            <span>•</span>
-            <span>PostgreSQL & Express</span>
+      {/* Global Minimal Footer only on non-dashboard views */}
+      {showTopNav && (
+        <footer className="border-t border-[#E8E5DF] bg-[#FFFFFF] py-4 text-center text-xs text-[#8A8578]">
+          <div className="max-w-6xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-2">
+            <p>© 2026 Roxx Store Rating Platform. All rights reserved.</p>
+            <div className="flex items-center gap-3 text-[#8A8578]">
+              <span>Verified ratings</span>
+              <span>•</span>
+              <span>Role permissions</span>
+              <span>•</span>
+              <span>PostgreSQL</span>
+            </div>
           </div>
-        </div>
-      </footer>
+        </footer>
+      )}
     </div>
   );
 };

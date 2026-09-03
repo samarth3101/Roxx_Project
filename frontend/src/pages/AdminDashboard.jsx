@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import api from '../api/axios';
+import { Sidebar } from '../components/Sidebar';
 import { StatCard } from '../components/StatCard';
 import { DataTable } from '../components/DataTable';
 import { StarRating } from '../components/StarRating';
@@ -8,14 +9,10 @@ import {
   Users,
   Store,
   Star,
-  UserPlus,
-  PlusCircle,
+  Plus,
   Search,
   Filter,
   Eye,
-  ShieldCheck,
-  Building2,
-  User,
   AlertCircle,
 } from 'lucide-react';
 
@@ -69,7 +66,7 @@ export const AdminDashboard = () => {
   const [addStoreLoading, setAddStoreLoading] = useState(false);
   const [addStoreError, setAddStoreError] = useState('');
 
-  // Load Dashboard Data
+  // Load Data
   const fetchStats = async () => {
     try {
       setStatsLoading(true);
@@ -180,7 +177,11 @@ export const AdminDashboard = () => {
     e.preventDefault();
     setAddUserError('');
     if (!isUserFormValid) {
-      setAddUserError('Please fulfill all validation criteria.');
+      if (!isUserNameValid) setAddUserError('Name must be 20 to 60 characters.');
+      else if (!isUserEmailValid) setAddUserError('Please enter a valid email address.');
+      else if (!hasUserPassLength || !hasUserPassUpper || !hasUserPassSpecial) {
+        setAddUserError('Password needs 8-16 characters, 1 uppercase letter, and 1 special character.');
+      }
       return;
     }
 
@@ -235,14 +236,12 @@ export const AdminDashboard = () => {
   // User Table Columns
   const userColumns = [
     {
-      header: 'User Name',
+      header: 'Name',
       field: 'name',
       render: (row) => (
         <div className="flex flex-col">
-          <span className="font-semibold text-slate-900 group-hover:text-blue-600 transition-colors">
-            {row.name}
-          </span>
-          <span className="text-[11px] text-slate-500">{row.email}</span>
+          <span className="font-medium text-[#1A1815]">{row.name}</span>
+          <span className="text-[11px] text-[#8A8578]">{row.email}</span>
         </div>
       ),
     },
@@ -252,24 +251,21 @@ export const AdminDashboard = () => {
       render: (row) => {
         if (row.role === 'ADMIN') {
           return (
-            <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-blue-50 text-blue-700 border border-blue-200">
-              <ShieldCheck className="w-3 h-3 text-blue-600" />
-              Admin
+            <span className="inline-flex items-center px-2 py-0.5 rounded-[4px] text-[11px] font-medium bg-[#FAF9F6] border border-[#E8E5DF] text-[#4A6FA5]">
+              Administrator
             </span>
           );
         }
         if (row.role === 'STORE_OWNER') {
           return (
-            <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-amber-50 text-amber-800 border border-amber-200">
-              <Building2 className="w-3 h-3 text-amber-600" />
-              Store Owner
+            <span className="inline-flex items-center px-2 py-0.5 rounded-[4px] text-[11px] font-medium bg-[#FAF9F6] border border-[#E8E5DF] text-[#C9714F]">
+              Store owner
             </span>
           );
         }
         return (
-          <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-slate-100 text-slate-700 border border-slate-200">
-            <User className="w-3 h-3 text-slate-600" />
-            Normal User
+          <span className="inline-flex items-center px-2 py-0.5 rounded-[4px] text-[11px] font-medium bg-[#FAF9F6] border border-[#E8E5DF] text-[#8A8578]">
+            User
           </span>
         );
       },
@@ -278,13 +274,13 @@ export const AdminDashboard = () => {
       header: 'Address',
       field: 'address',
       render: (row) => (
-        <span className="text-xs text-slate-600 line-clamp-1 max-w-xs" title={row.address}>
+        <span className="text-xs text-[#8A8578] line-clamp-1 max-w-xs" title={row.address}>
           {row.address}
         </span>
       ),
     },
     {
-      header: 'Store Rating (Owners)',
+      header: 'Store rating',
       field: 'storeRating',
       render: (row) => {
         if (row.role === 'STORE_OWNER') {
@@ -292,32 +288,33 @@ export const AdminDashboard = () => {
             return (
               <div className="flex items-center gap-1.5">
                 <StarRating value={row.storeRating} readOnly size="sm" />
-                <span className="text-xs font-bold text-amber-600">
+                <span className="text-xs tabular-nums text-[#2B2924] font-medium">
                   {row.storeRating.toFixed(1)}
                 </span>
-                <span className="text-[10px] text-slate-500">
+                <span className="text-[11px] text-[#8A8578]">
                   ({row.totalStoreRatings || 0})
                 </span>
               </div>
             );
           }
-          return <span className="text-xs text-slate-400 italic">No store assigned</span>;
+          return <span className="text-xs text-[#8A8578] italic">Unassigned</span>;
         }
-        return <span className="text-xs text-slate-400">—</span>;
+        return <span className="text-xs text-[#8A8578]">—</span>;
       },
     },
     {
-      header: 'Actions',
+      header: '',
       field: 'actions',
       sortable: false,
+      className: 'text-right w-10',
       render: (row) => (
         <button
           type="button"
           onClick={() => setSelectedUserDetail(row)}
-          className="p-1.5 rounded-lg text-slate-400 hover:text-slate-800 hover:bg-slate-100 transition-colors"
-          title="View Details"
+          className="p-1 text-[#8A8578] hover:text-[#1A1815] hover:bg-[#FAF9F6] rounded transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[#4A6FA5]"
+          title="View user details"
         >
-          <Eye className="w-4 h-4" />
+          <Eye className="w-3.5 h-3.5" />
         </button>
       ),
     },
@@ -326,14 +323,12 @@ export const AdminDashboard = () => {
   // Store Table Columns
   const storeColumns = [
     {
-      header: 'Store Name',
+      header: 'Store name',
       field: 'name',
       render: (row) => (
         <div className="flex flex-col">
-          <span className="font-semibold text-slate-900 group-hover:text-blue-600 transition-colors">
-            {row.name}
-          </span>
-          <span className="text-[11px] text-slate-500">{row.email}</span>
+          <span className="font-medium text-[#1A1815]">{row.name}</span>
+          <span className="text-[11px] text-[#8A8578]">{row.email}</span>
         </div>
       ),
     },
@@ -341,35 +336,35 @@ export const AdminDashboard = () => {
       header: 'Address',
       field: 'address',
       render: (row) => (
-        <span className="text-xs text-slate-600 line-clamp-1 max-w-sm" title={row.address}>
+        <span className="text-xs text-[#8A8578] line-clamp-1 max-w-sm" title={row.address}>
           {row.address}
         </span>
       ),
     },
     {
-      header: 'Assigned Owner',
+      header: 'Store owner',
       field: 'owner',
       sortable: false,
       render: (row) => (
         <div className="flex flex-col">
-          <span className="text-xs font-medium text-slate-800">
+          <span className="text-xs text-[#2B2924]">
             {row.owner?.name || 'Unassigned'}
           </span>
-          <span className="text-[10px] text-slate-500">{row.owner?.email}</span>
+          <span className="text-[11px] text-[#8A8578]">{row.owner?.email}</span>
         </div>
       ),
     },
     {
-      header: 'Overall Rating',
+      header: 'Average rating',
       field: 'rating',
       render: (row) => (
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-1.5">
           <StarRating value={row.rating} readOnly size="sm" />
-          <span className="text-xs font-bold text-amber-600">
+          <span className="text-xs tabular-nums text-[#2B2924] font-medium">
             {row.rating > 0 ? row.rating.toFixed(1) : 'Unrated'}
           </span>
-          <span className="text-[10px] text-slate-500">
-            ({row.totalRatings} {row.totalRatings === 1 ? 'review' : 'reviews'})
+          <span className="text-[11px] text-[#8A8578]">
+            ({row.totalRatings})
           </span>
         </div>
       ),
@@ -377,198 +372,212 @@ export const AdminDashboard = () => {
   ];
 
   return (
-    <div className="min-h-screen py-8 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto space-y-8">
-      {/* Top Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-        <div>
-          <h1 className="text-3xl font-extrabold font-display tracking-tight text-slate-900 flex items-center gap-2.5">
-            <ShieldCheck className="w-8 h-8 text-blue-600" />
-            System Administrator Dashboard
-          </h1>
-          <p className="text-sm text-slate-500 mt-1">
-            Platform overview, store management, user controls, and rating analytics
-          </p>
-        </div>
+    <div className="min-h-screen bg-[#FAF9F6] flex">
+      {/* 240px Fixed Sidebar */}
+      <Sidebar activeTab={activeTab} onTabChange={setActiveTab} />
 
-        {/* Global Quick Action Buttons */}
-        <div className="flex items-center gap-3">
-          <button
-            type="button"
-            onClick={() => setIsAddUserOpen(true)}
-            className="btn-primary text-xs py-2.5 px-4 flex items-center gap-1.5"
-          >
-            <UserPlus className="w-4 h-4" />
-            <span>Add User</span>
-          </button>
-          <button
-            type="button"
-            onClick={openAddStoreModal}
-            className="btn-secondary text-xs py-2.5 px-4 flex items-center gap-1.5 text-slate-800 hover:border-slate-400"
-          >
-            <PlusCircle className="w-4 h-4 text-blue-600" />
-            <span>Add Store</span>
-          </button>
-        </div>
-      </div>
-
-      {/* Metrics Row */}
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-5">
-        <StatCard
-          title="Total Registered Users"
-          value={stats.totalUsers}
-          icon={Users}
-          color="blue"
-          subtitle="Admins, Store Owners & Normal Users"
-        />
-        <StatCard
-          title="Total Registered Stores"
-          value={stats.totalStores}
-          icon={Store}
-          color="amber"
-          subtitle="Active stores listed on platform"
-        />
-        <StatCard
-          title="Total Ratings Submitted"
-          value={stats.totalRatings}
-          icon={Star}
-          color="emerald"
-          subtitle="Customer reviews & scores (1-5)"
-        />
-      </div>
-
-      {/* Tab Selector & Controls */}
-      <div className="bg-white rounded-2xl p-5 border border-slate-200 shadow-sm space-y-5">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-100 pb-4">
-          <div className="flex items-center gap-2">
-            <button
-              type="button"
-              onClick={() => setActiveTab('users')}
-              className={`px-4 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer ${
-                activeTab === 'users'
-                  ? 'bg-blue-600 text-white shadow-sm'
-                  : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
-              }`}
-            >
-              Users Directory ({users.length})
-            </button>
-            <button
-              type="button"
-              onClick={() => setActiveTab('stores')}
-              className={`px-4 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer ${
-                activeTab === 'stores'
-                  ? 'bg-blue-600 text-white shadow-sm'
-                  : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
-              }`}
-            >
-              Stores Catalog ({stores.length})
-            </button>
-          </div>
-
-          <div className="text-xs text-slate-500">
-            Click table column headers to sort ascending / descending
-          </div>
-        </div>
-
-        {/* Tab 1: Users View */}
-        {activeTab === 'users' && (
-          <div className="space-y-4">
-            {/* Filters Bar */}
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-              <div className="relative sm:col-span-2">
-                <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-3" />
-                <input
-                  type="text"
-                  placeholder="Filter by Name, Email, or Address..."
-                  value={userFilters.search}
-                  onChange={(e) =>
-                    setUserFilters((prev) => ({ ...prev, search: e.target.value }))
-                  }
-                  className="w-full pl-10 pr-4 py-2 rounded-xl glass-input text-xs"
-                />
-              </div>
-
-              <div className="relative">
-                <Filter className="w-4 h-4 text-slate-400 absolute left-3.5 top-3" />
-                <select
-                  value={userFilters.role}
-                  onChange={(e) =>
-                    setUserFilters((prev) => ({ ...prev, role: e.target.value }))
-                  }
-                  className="w-full pl-10 pr-4 py-2 rounded-xl glass-input text-xs bg-white appearance-none cursor-pointer"
-                >
-                  <option value="">All Roles</option>
-                  <option value="ADMIN">Administrator</option>
-                  <option value="STORE_OWNER">Store Owner</option>
-                  <option value="USER">Normal User</option>
-                </select>
-              </div>
+      {/* Main Content Area (offset by 240px on md+ screens) */}
+      <div className="flex-1 md:pl-[240px] flex flex-col min-h-screen">
+        <main className="flex-1 p-6 md:p-8 max-w-6xl w-full mx-auto space-y-6">
+          {/* Header Row */}
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-2">
+            <div>
+              <h1 className="text-xl font-semibold text-[#1A1815] tracking-tight">
+                System administration
+              </h1>
+              <p className="text-xs text-[#8A8578] mt-0.5">
+                Overview of accounts, stores, and ratings metrics
+              </p>
             </div>
 
-            {/* Users Table */}
-            <DataTable
-              columns={userColumns}
-              data={users}
-              sortField={userSort.field}
-              sortOrder={userSort.order}
-              onSort={handleUserSort}
-              loading={usersLoading}
-              emptyMessage="No users matching your filters found."
-            />
+            <div className="flex items-center gap-2">
+              <button
+                type="button"
+                onClick={() => setIsAddUserOpen(true)}
+                className="btn-secondary text-xs py-1.5 px-3 flex items-center gap-1.5"
+              >
+                <Plus className="w-3.5 h-3.5" />
+                <span>Add user</span>
+              </button>
+              <button
+                type="button"
+                onClick={openAddStoreModal}
+                className="btn-primary text-xs py-1.5 px-3 flex items-center gap-1.5"
+              >
+                <Plus className="w-3.5 h-3.5" />
+                <span>Add store</span>
+              </button>
+            </div>
           </div>
-        )}
 
-        {/* Tab 2: Stores View */}
-        {activeTab === 'stores' && (
-          <div className="space-y-4">
-            {/* Stores Filter Bar */}
-            <div className="relative">
-              <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-3" />
-              <input
-                type="text"
-                placeholder="Filter stores by Name, Email, or Address..."
-                value={storeFilters.search}
-                onChange={(e) =>
-                  setStoreFilters({ search: e.target.value })
-                }
-                className="w-full pl-10 pr-4 py-2 rounded-xl glass-input text-xs"
+          {/* Dotted Texture Hero Container behind Stat Cards */}
+          <div className="p-4 sm:p-5 rounded-[8px] border border-[#E8E5DF] bg-[#FFFFFF] texture-dots hero-glow">
+            <div className="relative z-10 grid grid-cols-1 sm:grid-cols-3 gap-3">
+              <StatCard
+                title="Total users"
+                value={stats.totalUsers}
+                icon={Users}
+                subtitle="All roles registered"
+              />
+              <StatCard
+                title="Total stores"
+                value={stats.totalStores}
+                icon={Store}
+                subtitle="Active stores on platform"
+              />
+              <StatCard
+                title="Total ratings"
+                value={stats.totalRatings}
+                icon={Star}
+                subtitle="Verified ratings submitted"
               />
             </div>
-
-            {/* Stores Table */}
-            <DataTable
-              columns={storeColumns}
-              data={stores}
-              sortField={storeSort.field}
-              sortOrder={storeSort.order}
-              onSort={handleStoreSort}
-              loading={storesLoading}
-              emptyMessage="No stores found."
-            />
           </div>
-        )}
+
+          {/* Table Container (flat and clean, NO dot texture inside) */}
+          <div className="space-y-3">
+            {/* View Switcher & Filters */}
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+              {/* Tabs */}
+              <div className="flex items-center border-b border-[#E8E5DF] gap-4">
+                <button
+                  type="button"
+                  onClick={() => setActiveTab('users')}
+                  className={`pb-2 text-xs font-medium transition-colors relative cursor-pointer ${
+                    activeTab === 'users'
+                      ? 'text-[#1A1815] font-semibold after:absolute after:bottom-0 after:left-0 after:right-0 after:h-[2px] after:bg-[#C9714F]'
+                      : 'text-[#8A8578] hover:text-[#2B2924]'
+                  }`}
+                >
+                  Users ({users.length})
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setActiveTab('stores')}
+                  className={`pb-2 text-xs font-medium transition-colors relative cursor-pointer ${
+                    activeTab === 'stores'
+                      ? 'text-[#1A1815] font-semibold after:absolute after:bottom-0 after:left-0 after:right-0 after:h-[2px] after:bg-[#C9714F]'
+                      : 'text-[#8A8578] hover:text-[#2B2924]'
+                  }`}
+                >
+                  Stores ({stores.length})
+                </button>
+              </div>
+
+              {/* Filters */}
+              {activeTab === 'users' ? (
+                <div className="flex items-center gap-2">
+                  <div className="relative">
+                    <Search className="w-3.5 h-3.5 text-[#8A8578] absolute left-2.5 top-2.5" />
+                    <input
+                      type="text"
+                      placeholder="Search name, email, address..."
+                      value={userFilters.search}
+                      onChange={(e) =>
+                        setUserFilters((prev) => ({ ...prev, search: e.target.value }))
+                      }
+                      className="craft-input pl-8 py-1.5 text-xs w-56"
+                    />
+                  </div>
+
+                  <div className="relative">
+                    <select
+                      value={userFilters.role}
+                      onChange={(e) =>
+                        setUserFilters((prev) => ({ ...prev, role: e.target.value }))
+                      }
+                      className="craft-input py-1.5 text-xs bg-[#FFFFFF] pr-7 cursor-pointer"
+                    >
+                      <option value="">All roles</option>
+                      <option value="ADMIN">Administrator</option>
+                      <option value="STORE_OWNER">Store owner</option>
+                      <option value="USER">Normal user</option>
+                    </select>
+                  </div>
+                </div>
+              ) : (
+                <div className="relative">
+                  <Search className="w-3.5 h-3.5 text-[#8A8578] absolute left-2.5 top-2.5" />
+                  <input
+                    type="text"
+                    placeholder="Search store name or address..."
+                    value={storeFilters.search}
+                    onChange={(e) =>
+                      setStoreFilters({ search: e.target.value })
+                    }
+                    className="craft-input pl-8 py-1.5 text-xs w-64"
+                  />
+                </div>
+              )}
+            </div>
+
+            {/* Dense Data Tables */}
+            {activeTab === 'users' ? (
+              <DataTable
+                columns={userColumns}
+                data={users}
+                sortField={userSort.field}
+                sortOrder={userSort.order}
+                onSort={handleUserSort}
+                loading={usersLoading}
+                emptyTitle="No users found"
+                emptyDescription="No users match the selected search or role filter."
+                emptyAction={
+                  <button
+                    type="button"
+                    onClick={() => setUserFilters({ search: '', role: '' })}
+                    className="btn-secondary text-xs py-1 px-2.5"
+                  >
+                    Reset filters
+                  </button>
+                }
+              />
+            ) : (
+              <DataTable
+                columns={storeColumns}
+                data={stores}
+                sortField={storeSort.field}
+                sortOrder={storeSort.order}
+                onSort={handleStoreSort}
+                loading={storesLoading}
+                emptyTitle="No stores registered"
+                emptyDescription="There are currently no stores matching your query."
+                emptyAction={
+                  <button
+                    type="button"
+                    onClick={openAddStoreModal}
+                    className="btn-primary text-xs py-1 px-2.5"
+                  >
+                    Add a store
+                  </button>
+                }
+              />
+            )}
+          </div>
+        </main>
       </div>
 
       {/* Modal: Add User */}
       <Modal
         isOpen={isAddUserOpen}
         onClose={() => setIsAddUserOpen(false)}
-        title="Add New User to Platform"
-        maxWidth="max-w-lg"
+        title="Add user"
+        maxWidth="max-w-md"
       >
-        <form onSubmit={handleCreateUser} className="space-y-4">
+        <form onSubmit={handleCreateUser} className="space-y-3.5">
           {addUserError && (
-            <div className="p-3 bg-rose-50 border border-rose-200 rounded-xl text-rose-700 text-xs flex items-center gap-2">
-              <AlertCircle className="w-4 h-4 shrink-0 text-rose-600" />
+            <div className="p-2.5 bg-[#FAF9F6] border border-[#B5544A]/30 rounded-[8px] text-[#B5544A] text-xs flex items-center gap-2">
+              <AlertCircle className="w-4 h-4 shrink-0" />
               <span>{addUserError}</span>
             </div>
           )}
 
           <div>
             <div className="flex justify-between items-center mb-1">
-              <label className="text-xs font-semibold text-slate-700">
-                Full Name (20 to 60 characters)
+              <label className="text-xs font-medium text-[#2B2924]">
+                Full name (20 to 60 characters)
               </label>
-              <span className="text-[11px] text-slate-400">{newUserData.name.length}/60</span>
+              <span className="text-[11px] tabular-nums text-[#8A8578]">{newUserData.name.length}/60</span>
             </div>
             <input
               type="text"
@@ -576,13 +585,13 @@ export const AdminDashboard = () => {
               value={newUserData.name}
               onChange={(e) => setNewUserData({ ...newUserData, name: e.target.value })}
               placeholder="e.g. Alexander James Store Owner 1"
-              className="w-full px-3.5 py-2 rounded-xl glass-input text-xs"
+              className="w-full craft-input"
             />
           </div>
 
           <div>
-            <label className="block text-xs font-semibold text-slate-700 mb-1">
-              Email Address
+            <label className="block text-xs font-medium text-[#2B2924] mb-1">
+              Email address
             </label>
             <input
               type="email"
@@ -590,27 +599,27 @@ export const AdminDashboard = () => {
               value={newUserData.email}
               onChange={(e) => setNewUserData({ ...newUserData, email: e.target.value })}
               placeholder="user@example.com"
-              className="w-full px-3.5 py-2 rounded-xl glass-input text-xs"
+              className="w-full craft-input"
             />
           </div>
 
           <div>
-            <label className="block text-xs font-semibold text-slate-700 mb-1">
+            <label className="block text-xs font-medium text-[#2B2924] mb-1">
               Role
             </label>
             <select
               value={newUserData.role}
               onChange={(e) => setNewUserData({ ...newUserData, role: e.target.value })}
-              className="w-full px-3.5 py-2 rounded-xl glass-input text-xs bg-white cursor-pointer"
+              className="w-full craft-input bg-[#FFFFFF] cursor-pointer"
             >
-              <option value="USER">Normal User</option>
-              <option value="STORE_OWNER">Store Owner</option>
-              <option value="ADMIN">System Administrator</option>
+              <option value="USER">Normal user</option>
+              <option value="STORE_OWNER">Store owner</option>
+              <option value="ADMIN">Administrator</option>
             </select>
           </div>
 
           <div>
-            <label className="block text-xs font-semibold text-slate-700 mb-1">
+            <label className="block text-xs font-medium text-[#2B2924] mb-1">
               Address (max 400 characters)
             </label>
             <textarea
@@ -618,39 +627,39 @@ export const AdminDashboard = () => {
               rows={2}
               value={newUserData.address}
               onChange={(e) => setNewUserData({ ...newUserData, address: e.target.value })}
-              placeholder="e.g. 450 Commercial Avenue, Market District"
-              className="w-full px-3.5 py-2 rounded-xl glass-input text-xs resize-none"
+              placeholder="Street address, city, state"
+              className="w-full craft-input resize-none"
             />
           </div>
 
           <div>
-            <label className="block text-xs font-semibold text-slate-700 mb-1">
-              Password (8-16 chars, 1 uppercase, 1 special character)
+            <label className="block text-xs font-medium text-[#2B2924] mb-1">
+              Password (8 to 16 characters, 1 uppercase, 1 special character)
             </label>
             <input
               type="password"
               required
               value={newUserData.password}
               onChange={(e) => setNewUserData({ ...newUserData, password: e.target.value })}
-              placeholder="e.g. AdminPass@2026"
-              className="w-full px-3.5 py-2 rounded-xl glass-input text-xs"
+              placeholder="••••••••"
+              className="w-full craft-input"
             />
           </div>
 
-          <div className="flex items-center justify-end gap-2 pt-3">
+          <div className="flex items-center justify-end gap-2 pt-2">
             <button
               type="button"
               onClick={() => setIsAddUserOpen(false)}
-              className="btn-secondary text-xs px-3 py-2"
+              className="btn-secondary text-xs py-1.5 px-3"
             >
               Cancel
             </button>
             <button
               type="submit"
               disabled={!isUserFormValid || addUserLoading}
-              className="btn-primary text-xs px-4 py-2"
+              className="btn-primary text-xs py-1.5 px-3.5"
             >
-              {addUserLoading ? 'Creating...' : 'Create User'}
+              {addUserLoading ? 'Creating...' : 'Create user'}
             </button>
           </div>
         </form>
@@ -660,23 +669,23 @@ export const AdminDashboard = () => {
       <Modal
         isOpen={isAddStoreOpen}
         onClose={() => setIsAddStoreOpen(false)}
-        title="Register New Store"
-        maxWidth="max-w-lg"
+        title="Register new store"
+        maxWidth="max-w-md"
       >
-        <form onSubmit={handleCreateStore} className="space-y-4">
+        <form onSubmit={handleCreateStore} className="space-y-3.5">
           {addStoreError && (
-            <div className="p-3 bg-rose-50 border border-rose-200 rounded-xl text-rose-700 text-xs flex items-center gap-2">
-              <AlertCircle className="w-4 h-4 shrink-0 text-rose-600" />
+            <div className="p-2.5 bg-[#FAF9F6] border border-[#B5544A]/30 rounded-[8px] text-[#B5544A] text-xs flex items-center gap-2">
+              <AlertCircle className="w-4 h-4 shrink-0" />
               <span>{addStoreError}</span>
             </div>
           )}
 
           <div>
             <div className="flex justify-between items-center mb-1">
-              <label className="text-xs font-semibold text-slate-700">
-                Store Name (20 to 60 characters)
+              <label className="text-xs font-medium text-[#2B2924]">
+                Store name (20 to 60 characters)
               </label>
-              <span className="text-[11px] text-slate-400">{newStoreData.name.length}/60</span>
+              <span className="text-[11px] tabular-nums text-[#8A8578]">{newStoreData.name.length}/60</span>
             </div>
             <input
               type="text"
@@ -684,13 +693,13 @@ export const AdminDashboard = () => {
               value={newStoreData.name}
               onChange={(e) => setNewStoreData({ ...newStoreData, name: e.target.value })}
               placeholder="e.g. Apex Grand Artisan Emporium"
-              className="w-full px-3.5 py-2 rounded-xl glass-input text-xs"
+              className="w-full craft-input"
             />
           </div>
 
           <div>
-            <label className="block text-xs font-semibold text-slate-700 mb-1">
-              Store Email Address
+            <label className="block text-xs font-medium text-[#2B2924] mb-1">
+              Store email
             </label>
             <input
               type="email"
@@ -698,36 +707,36 @@ export const AdminDashboard = () => {
               value={newStoreData.email}
               onChange={(e) => setNewStoreData({ ...newStoreData, email: e.target.value })}
               placeholder="store@example.com"
-              className="w-full px-3.5 py-2 rounded-xl glass-input text-xs"
+              className="w-full craft-input"
             />
           </div>
 
           <div>
-            <label className="block text-xs font-semibold text-slate-700 mb-1">
-              Store Address (max 400 characters)
+            <label className="block text-xs font-medium text-[#2B2924] mb-1">
+              Store address
             </label>
             <textarea
               required
               rows={2}
               value={newStoreData.address}
               onChange={(e) => setNewStoreData({ ...newStoreData, address: e.target.value })}
-              placeholder="e.g. 742 Evergreen Terrace, Commercial Core"
-              className="w-full px-3.5 py-2 rounded-xl glass-input text-xs resize-none"
+              placeholder="Store location details"
+              className="w-full craft-input resize-none"
             />
           </div>
 
           <div>
-            <label className="block text-xs font-semibold text-slate-700 mb-1">
-              Assign Store Owner (Must be a registered STORE_OWNER without a store)
+            <label className="block text-xs font-medium text-[#2B2924] mb-1">
+              Assigned store owner
             </label>
             {availableOwners.length > 0 ? (
               <select
                 required
                 value={newStoreData.ownerId}
                 onChange={(e) => setNewStoreData({ ...newStoreData, ownerId: e.target.value })}
-                className="w-full px-3.5 py-2 rounded-xl glass-input text-xs bg-white cursor-pointer"
+                className="w-full craft-input bg-[#FFFFFF] cursor-pointer"
               >
-                <option value="">Select a Store Owner...</option>
+                <option value="">Select an unassigned store owner...</option>
                 {availableOwners.map((owner) => (
                   <option key={owner.id} value={owner.id}>
                     {owner.name} ({owner.email})
@@ -735,26 +744,26 @@ export const AdminDashboard = () => {
                 ))}
               </select>
             ) : (
-              <div className="p-3 bg-amber-50 border border-amber-200 rounded-xl text-amber-800 text-xs">
-                No unassigned Store Owners found. Please create a user with role "Store Owner" first.
-              </div>
+              <p className="text-xs text-[#C9A15A] p-2 rounded-[6px] bg-[#FAF9F6] border border-[#E8E5DF]">
+                No available store owners found without a store. Create a store owner user first.
+              </p>
             )}
           </div>
 
-          <div className="flex items-center justify-end gap-2 pt-3">
+          <div className="flex items-center justify-end gap-2 pt-2">
             <button
               type="button"
               onClick={() => setIsAddStoreOpen(false)}
-              className="btn-secondary text-xs px-3 py-2"
+              className="btn-secondary text-xs py-1.5 px-3"
             >
               Cancel
             </button>
             <button
               type="submit"
               disabled={!isStoreFormValid || addStoreLoading}
-              className="btn-primary text-xs px-4 py-2"
+              className="btn-primary text-xs py-1.5 px-3.5"
             >
-              {addStoreLoading ? 'Registering...' : 'Register Store'}
+              {addStoreLoading ? 'Registering...' : 'Register store'}
             </button>
           </div>
         </form>
@@ -765,53 +774,53 @@ export const AdminDashboard = () => {
         <Modal
           isOpen={!!selectedUserDetail}
           onClose={() => setSelectedUserDetail(null)}
-          title="User Information & Details"
+          title="User details"
           maxWidth="max-w-md"
         >
-          <div className="space-y-4 text-xs">
-            <div className="p-4 rounded-xl bg-slate-50 border border-slate-200 space-y-2.5">
+          <div className="space-y-3 text-xs">
+            <div className="p-3.5 rounded-[8px] bg-[#FAF9F6] border border-[#E8E5DF] space-y-2">
               <div>
-                <span className="text-slate-500 block font-medium">Full Name:</span>
-                <span className="text-slate-900 text-sm font-semibold">{selectedUserDetail.name}</span>
+                <span className="text-[#8A8578] block font-normal">Full name</span>
+                <span className="text-[#1A1815] text-sm font-medium">{selectedUserDetail.name}</span>
               </div>
               <div>
-                <span className="text-slate-500 block font-medium">Email:</span>
-                <span className="text-slate-700">{selectedUserDetail.email}</span>
+                <span className="text-[#8A8578] block font-normal">Email</span>
+                <span className="text-[#2B2924]">{selectedUserDetail.email}</span>
               </div>
               <div>
-                <span className="text-slate-500 block font-medium">Role:</span>
-                <span className="font-bold text-blue-600">{selectedUserDetail.role}</span>
+                <span className="text-[#8A8578] block font-normal">Role</span>
+                <span className="font-medium text-[#4A6FA5]">{selectedUserDetail.role}</span>
               </div>
               <div>
-                <span className="text-slate-500 block font-medium">Address:</span>
-                <span className="text-slate-700">{selectedUserDetail.address}</span>
+                <span className="text-[#8A8578] block font-normal">Address</span>
+                <span className="text-[#2B2924]">{selectedUserDetail.address}</span>
               </div>
 
               {selectedUserDetail.role === 'STORE_OWNER' && (
-                <div className="pt-2 border-t border-slate-200">
-                  <span className="text-slate-500 block font-medium">Managed Store & Rating:</span>
+                <div className="pt-2 border-t border-[#E8E5DF]">
+                  <span className="text-[#8A8578] block font-normal">Managed store & rating</span>
                   {selectedUserDetail.store ? (
                     <div className="mt-1 flex items-center justify-between">
-                      <span className="font-semibold text-slate-900">{selectedUserDetail.store.name}</span>
+                      <span className="font-medium text-[#1A1815]">{selectedUserDetail.store.name}</span>
                       <div className="flex items-center gap-1.5">
                         <StarRating value={selectedUserDetail.storeRating || 0} readOnly size="sm" />
-                        <span className="font-bold text-amber-600">
+                        <span className="font-medium tabular-nums text-[#2B2924]">
                           {selectedUserDetail.storeRating ? selectedUserDetail.storeRating.toFixed(1) : '0.0'}
                         </span>
                       </div>
                     </div>
                   ) : (
-                    <span className="text-slate-400 italic">No store assigned yet</span>
+                    <span className="text-[#8A8578] italic">No store assigned yet</span>
                   )}
                 </div>
               )}
             </div>
 
-            <div className="flex justify-end">
+            <div className="flex justify-end pt-1">
               <button
                 type="button"
                 onClick={() => setSelectedUserDetail(null)}
-                className="btn-secondary text-xs px-4 py-2"
+                className="btn-secondary text-xs py-1.5 px-3"
               >
                 Close
               </button>

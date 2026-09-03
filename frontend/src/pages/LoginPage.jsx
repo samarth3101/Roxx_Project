@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { Store, Lock, Mail, ArrowRight, Shield, Building2, User, AlertCircle } from 'lucide-react';
+import { Store, ArrowRight, Shield, Building2, User, AlertCircle } from 'lucide-react';
 
 export const LoginPage = () => {
   const { login } = useAuth();
@@ -27,7 +27,7 @@ export const LoginPage = () => {
         navigate('/stores');
       }
     } catch (err) {
-      setError(err.response?.data?.message || err.message || 'Invalid email or password');
+      setError(err.response?.data?.message || err.message || 'Incorrect email or password. Please try again.');
     } finally {
       setLoading(false);
     }
@@ -40,122 +40,118 @@ export const LoginPage = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-4 sm:p-6 lg:p-8">
-      <div className="w-full max-w-md space-y-6">
+    <div className="min-h-screen bg-[#FAF9F6] texture-dots hero-glow flex items-center justify-center p-4 sm:p-6">
+      <div className="w-full max-w-[400px] z-10 space-y-6">
         {/* Header */}
-        <div className="text-center space-y-2">
-          <div className="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-blue-600 shadow-lg shadow-blue-500/20 mb-2">
-            <Store className="w-7 h-7 text-white" />
+        <div className="text-center space-y-1.5">
+          <div className="inline-flex items-center justify-center w-10 h-10 rounded-[8px] bg-[#FFFFFF] border border-[#E8E5DF] text-[#C9714F] mb-1">
+            <Store className="w-5 h-5" />
           </div>
-          <h1 className="text-3xl font-extrabold font-display tracking-tight text-slate-900">
-            Welcome Back
+          <h1 className="text-2xl font-semibold text-[#1A1815] tracking-tight">
+            Sign in to your account
           </h1>
-          <p className="text-sm text-slate-500">
-            Sign in to access your role-specific dashboard & store ratings
+          <p className="text-xs text-[#8A8578]">
+            Access platform management, stores, and ratings
           </p>
         </div>
 
         {/* Card */}
-        <div className="bg-white p-6 sm:p-8 rounded-2xl shadow-xl border border-slate-200 space-y-5">
+        <div className="craft-card p-6 sm:p-7 space-y-5">
           {error && (
-            <div className="p-3.5 bg-rose-50 border border-rose-200 rounded-xl text-rose-700 text-xs flex items-center gap-2.5">
-              <AlertCircle className="w-4 h-4 shrink-0 text-rose-600" />
+            <div className="p-3 bg-[#FAF9F6] border border-[#B5544A]/30 rounded-[8px] text-[#B5544A] text-xs flex items-center gap-2">
+              <AlertCircle className="w-4 h-4 shrink-0" />
               <span>{error}</span>
             </div>
           )}
 
           <form onSubmit={handleLogin} className="space-y-4">
             <div>
-              <label className="block text-xs font-semibold text-slate-700 mb-1.5">
-                Email Address
+              <label className="block text-xs font-medium text-[#2B2924] mb-1">
+                Email address
               </label>
-              <div className="relative">
-                <Mail className="w-4 h-4 text-slate-400 absolute left-3.5 top-3.5" />
-                <input
-                  type="email"
-                  required
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  placeholder="name@example.com"
-                  className="w-full pl-10 pr-4 py-2.5 rounded-xl glass-input text-sm"
-                />
-              </div>
+              <input
+                type="email"
+                required
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder="name@example.com"
+                className="w-full craft-input"
+              />
             </div>
 
             <div>
-              <label className="block text-xs font-semibold text-slate-700 mb-1.5">
-                Password
-              </label>
-              <div className="relative">
-                <Lock className="w-4 h-4 text-slate-400 absolute left-3.5 top-3.5" />
-                <input
-                  type="password"
-                  required
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  placeholder="••••••••"
-                  className="w-full pl-10 pr-4 py-2.5 rounded-xl glass-input text-sm"
-                />
+              <div className="flex items-center justify-between mb-1">
+                <label className="text-xs font-medium text-[#2B2924]">
+                  Password
+                </label>
               </div>
+              <input
+                type="password"
+                required
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                placeholder="••••••••"
+                className="w-full craft-input"
+              />
             </div>
 
             <button
               type="submit"
               disabled={loading}
-              className="w-full btn-primary py-3 text-sm font-semibold mt-2"
+              className="w-full btn-primary py-2 text-sm mt-1"
             >
               {loading ? (
                 <div className="flex items-center gap-2">
-                  <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                  <span>Signing In...</span>
+                  <div className="w-3.5 h-3.5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                  <span>Signing in...</span>
                 </div>
               ) : (
-                <div className="flex items-center gap-2">
-                  <span>Sign In</span>
+                <div className="flex items-center gap-1.5">
+                  <span>Sign in</span>
                   <ArrowRight className="w-4 h-4" />
                 </div>
               )}
             </button>
           </form>
 
-          {/* Quick Demo Credentials */}
-          <div className="pt-4 border-t border-slate-100 space-y-2.5">
-            <p className="text-[11px] font-semibold text-slate-400 uppercase tracking-wider text-center">
-              Instant Demo Access
+          {/* Quick Demo Access Credentials */}
+          <div className="pt-4 border-t border-[#E8E5DF] space-y-2">
+            <p className="text-[11px] font-medium text-[#8A8578] text-center">
+              Quick demo login
             </p>
-            <div className="grid grid-cols-3 gap-2">
+            <div className="grid grid-cols-3 gap-1.5">
               <button
                 type="button"
                 onClick={() => fillDemo('admin@roxx.com', 'Admin@1234')}
-                className="p-2.5 rounded-xl bg-blue-50 hover:bg-blue-100 border border-blue-200 text-[11px] font-semibold text-blue-700 transition-colors flex flex-col items-center gap-1 cursor-pointer shadow-xs"
+                className="p-2 rounded-[6px] bg-[#FAF9F6] hover:bg-[#F2EFE9] border border-[#E8E5DF] text-[11px] font-medium text-[#2B2924] transition-colors flex flex-col items-center gap-1 cursor-pointer focus-visible:ring-1 focus-visible:ring-[#4A6FA5]"
               >
-                <Shield className="w-4 h-4 text-blue-600" />
+                <Shield className="w-3.5 h-3.5 text-[#4A6FA5]" />
                 <span>Admin</span>
               </button>
               <button
                 type="button"
                 onClick={() => fillDemo('owner1@roxx.com', 'Owner@1234')}
-                className="p-2.5 rounded-xl bg-amber-50 hover:bg-amber-100 border border-amber-200 text-[11px] font-semibold text-amber-800 transition-colors flex flex-col items-center gap-1 cursor-pointer shadow-xs"
+                className="p-2 rounded-[6px] bg-[#FAF9F6] hover:bg-[#F2EFE9] border border-[#E8E5DF] text-[11px] font-medium text-[#2B2924] transition-colors flex flex-col items-center gap-1 cursor-pointer focus-visible:ring-1 focus-visible:ring-[#4A6FA5]"
               >
-                <Building2 className="w-4 h-4 text-amber-600" />
-                <span>Store Owner</span>
+                <Building2 className="w-3.5 h-3.5 text-[#C9714F]" />
+                <span>Store owner</span>
               </button>
               <button
                 type="button"
                 onClick={() => fillDemo('user1@roxx.com', 'User@1234')}
-                className="p-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 border border-slate-200 text-[11px] font-semibold text-slate-700 transition-colors flex flex-col items-center gap-1 cursor-pointer shadow-xs"
+                className="p-2 rounded-[6px] bg-[#FAF9F6] hover:bg-[#F2EFE9] border border-[#E8E5DF] text-[11px] font-medium text-[#2B2924] transition-colors flex flex-col items-center gap-1 cursor-pointer focus-visible:ring-1 focus-visible:ring-[#4A6FA5]"
               >
-                <User className="w-4 h-4 text-slate-600" />
-                <span>Normal User</span>
+                <User className="w-3.5 h-3.5 text-[#6B8F6B]" />
+                <span>Normal user</span>
               </button>
             </div>
           </div>
         </div>
 
         {/* Footer */}
-        <p className="text-center text-xs text-slate-500">
-          Don't have an account?{' '}
-          <Link to="/signup" className="text-blue-600 hover:text-blue-700 font-semibold underline underline-offset-4">
+        <p className="text-center text-xs text-[#8A8578]">
+          Don't have an account yet?{' '}
+          <Link to="/signup" className="craft-link font-medium">
             Sign up as a normal user
           </Link>
         </p>

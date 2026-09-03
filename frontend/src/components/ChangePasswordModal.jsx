@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Modal } from './Modal';
 import { useAuth } from '../context/AuthContext';
-import { CheckCircle2, XCircle, AlertCircle } from 'lucide-react';
+import { Check, X, AlertCircle } from 'lucide-react';
 
 export const ChangePasswordModal = ({ isOpen, onClose }) => {
   const { updatePassword } = useAuth();
@@ -25,23 +25,31 @@ export const ChangePasswordModal = ({ isOpen, onClose }) => {
     setSuccess('');
 
     if (!isFormValid) {
-      setError('Please fulfill all password requirements before submitting.');
+      if (!hasLength) {
+        setError('Password must be between 8 and 16 characters in length.');
+      } else if (!hasUpper) {
+        setError('Password needs at least one uppercase letter (A-Z).');
+      } else if (!hasSpecial) {
+        setError('Password must include at least one special character (e.g. !@#$%^&*).');
+      } else if (!passwordsMatch) {
+        setError('The new passwords do not match.');
+      }
       return;
     }
 
     setLoading(true);
     try {
       await updatePassword(currentPassword, newPassword);
-      setSuccess('Password changed successfully!');
+      setSuccess('Password updated successfully.');
       setTimeout(() => {
         setCurrentPassword('');
         setNewPassword('');
         setConfirmPassword('');
         setSuccess('');
         onClose();
-      }, 1500);
+      }, 1200);
     } catch (err) {
-      setError(err.response?.data?.message || err.message || 'Failed to update password');
+      setError(err.response?.data?.message || err.message || 'Failed to update password.');
     } finally {
       setLoading(false);
     }
@@ -57,25 +65,25 @@ export const ChangePasswordModal = ({ isOpen, onClose }) => {
   };
 
   return (
-    <Modal isOpen={isOpen} onClose={handleClose} title="Update Your Password">
+    <Modal isOpen={isOpen} onClose={handleClose} title="Change password">
       <form onSubmit={handleSubmit} className="space-y-4">
         {error && (
-          <div className="p-3 bg-rose-50 border border-rose-200 rounded-xl text-rose-700 text-xs flex items-center gap-2">
-            <AlertCircle className="w-4 h-4 shrink-0 text-rose-600" />
+          <div className="p-2.5 bg-[#FAF9F6] border border-[#B5544A]/30 rounded-[8px] text-[#B5544A] text-xs flex items-center gap-2">
+            <AlertCircle className="w-4 h-4 shrink-0" />
             <span>{error}</span>
           </div>
         )}
 
         {success && (
-          <div className="p-3 bg-emerald-50 border border-emerald-200 rounded-xl text-emerald-700 text-xs flex items-center gap-2">
-            <CheckCircle2 className="w-4 h-4 shrink-0 text-emerald-600" />
+          <div className="p-2.5 bg-[#FAF9F6] border border-[#6B8F6B]/30 rounded-[8px] text-[#6B8F6B] text-xs flex items-center gap-2">
+            <Check className="w-4 h-4 shrink-0" />
             <span>{success}</span>
           </div>
         )}
 
         <div>
-          <label className="block text-xs font-semibold text-slate-700 mb-1.5">
-            Current Password
+          <label className="block text-xs font-medium text-[#2B2924] mb-1">
+            Current password
           </label>
           <input
             type="password"
@@ -83,27 +91,27 @@ export const ChangePasswordModal = ({ isOpen, onClose }) => {
             value={currentPassword}
             onChange={(e) => setCurrentPassword(e.target.value)}
             placeholder="Enter current password"
-            className="w-full px-3.5 py-2.5 rounded-xl glass-input text-sm"
+            className="w-full craft-input"
           />
         </div>
 
         <div>
-          <label className="block text-xs font-semibold text-slate-700 mb-1.5">
-            New Password
+          <label className="block text-xs font-medium text-[#2B2924] mb-1">
+            New password
           </label>
           <input
             type="password"
             required
             value={newPassword}
             onChange={(e) => setNewPassword(e.target.value)}
-            placeholder="8-16 characters"
-            className="w-full px-3.5 py-2.5 rounded-xl glass-input text-sm"
+            placeholder="8 to 16 characters"
+            className="w-full craft-input"
           />
         </div>
 
         <div>
-          <label className="block text-xs font-semibold text-slate-700 mb-1.5">
-            Confirm New Password
+          <label className="block text-xs font-medium text-[#2B2924] mb-1">
+            Confirm new password
           </label>
           <input
             type="password"
@@ -111,71 +119,71 @@ export const ChangePasswordModal = ({ isOpen, onClose }) => {
             value={confirmPassword}
             onChange={(e) => setConfirmPassword(e.target.value)}
             placeholder="Re-enter new password"
-            className="w-full px-3.5 py-2.5 rounded-xl glass-input text-sm"
+            className="w-full craft-input"
           />
         </div>
 
-        {/* Live Validation Hints */}
-        <div className="p-3.5 bg-slate-50 rounded-xl border border-slate-200 space-y-1.5 text-xs">
-          <p className="font-semibold text-slate-700 mb-1">Password Requirements:</p>
+        {/* Real-time Inline Validation Feedback */}
+        <div className="p-3 bg-[#FAF9F6] rounded-[8px] border border-[#E8E5DF] space-y-1.5 text-xs">
+          <p className="font-medium text-[#2B2924] mb-1">Requirements:</p>
           <div className="flex items-center gap-2">
             {hasLength ? (
-              <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
+              <Check className="w-3.5 h-3.5 text-[#6B8F6B]" />
             ) : (
-              <XCircle className="w-3.5 h-3.5 text-slate-400" />
+              <X className="w-3.5 h-3.5 text-[#8A8578]" />
             )}
-            <span className={hasLength ? 'text-emerald-700 font-medium' : 'text-slate-500'}>
-              8 to 16 characters in length
+            <span className={hasLength ? 'text-[#6B8F6B] font-medium' : 'text-[#8A8578]'}>
+              8 to 16 characters
             </span>
           </div>
           <div className="flex items-center gap-2">
             {hasUpper ? (
-              <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
+              <Check className="w-3.5 h-3.5 text-[#6B8F6B]" />
             ) : (
-              <XCircle className="w-3.5 h-3.5 text-slate-400" />
+              <X className="w-3.5 h-3.5 text-[#8A8578]" />
             )}
-            <span className={hasUpper ? 'text-emerald-700 font-medium' : 'text-slate-500'}>
+            <span className={hasUpper ? 'text-[#6B8F6B] font-medium' : 'text-[#8A8578]'}>
               At least one uppercase letter (A-Z)
             </span>
           </div>
           <div className="flex items-center gap-2">
             {hasSpecial ? (
-              <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
+              <Check className="w-3.5 h-3.5 text-[#6B8F6B]" />
             ) : (
-              <XCircle className="w-3.5 h-3.5 text-slate-400" />
+              <X className="w-3.5 h-3.5 text-[#8A8578]" />
             )}
-            <span className={hasSpecial ? 'text-emerald-700 font-medium' : 'text-slate-500'}>
+            <span className={hasSpecial ? 'text-[#6B8F6B] font-medium' : 'text-[#8A8578]'}>
               At least one special character (!@#$%^&*...)
             </span>
           </div>
           {newPassword && (
             <div className="flex items-center gap-2">
               {passwordsMatch ? (
-                <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
+                <Check className="w-3.5 h-3.5 text-[#6B8F6B]" />
               ) : (
-                <XCircle className="w-3.5 h-3.5 text-rose-500" />
+                <X className="w-3.5 h-3.5 text-[#B5544A]" />
               )}
-              <span className={passwordsMatch ? 'text-emerald-700 font-medium' : 'text-rose-600'}>
+              <span className={passwordsMatch ? 'text-[#6B8F6B] font-medium' : 'text-[#B5544A]'}>
                 Passwords match
               </span>
             </div>
           )}
         </div>
 
-        <div className="flex items-center justify-end gap-3 pt-2">
+        <div className="flex items-center justify-end gap-2 pt-2">
           <button
             type="button"
             onClick={handleClose}
-            className="btn-secondary text-xs px-3.5 py-2"
+            className="btn-secondary text-xs py-1.5 px-3"
           >
             Cancel
           </button>
           <button
             type="submit"
             disabled={!isFormValid || loading}
-            className="btn-primary text-xs px-4 py-2"
+            className="btn-primary text-xs py-1.5 px-3.5"
           >
-            {loading ? 'Updating...' : 'Update Password'}
+            {loading ? 'Updating...' : 'Update password'}
           </button>
         </div>
       </form>
