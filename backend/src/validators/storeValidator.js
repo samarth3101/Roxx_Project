@@ -4,7 +4,7 @@ export const createStoreSchema = z.object({
   name: z
     .string({ required_error: 'Store name is required' })
     .trim()
-    .min(5, 'Store name must be at least 5 characters long')
+    .min(2, 'Store name must be at least 2 characters long')
     .max(60, 'Store name cannot exceed 60 characters'),
   email: z
     .string({ required_error: 'Store email is required' })

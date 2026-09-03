@@ -88,12 +88,12 @@ async function runApiTests() {
     });
 
     // 5. Validation Rejection on Signup
-    await test('Signup rejects name < 5 characters', async () => {
+    await test('Signup rejects name < 2 characters', async () => {
       const res = await fetch(`${baseUrl}/auth/signup`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          name: 'Sam',
+          name: 'S',
           email: 'newuser@example.com',
           password: 'Password@123',
           address: 'Some address somewhere',
