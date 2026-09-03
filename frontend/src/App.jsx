@@ -1,33 +1,23 @@
 import React from 'react';
-import { Routes, Route, Navigate } from 'react-router-dom';
+import { Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import { useAuth } from './context/AuthContext';
-import { PublicLayout } from './layouts/PublicLayout';
-import { AppLayout } from './layouts/AppLayout';
+import { Navbar } from './components/Navbar';
 import { ProtectedRoute } from './components/ProtectedRoute';
-import { HomePage } from './pages/HomePage';
 import { LoginPage } from './pages/LoginPage';
 import { SignupPage } from './pages/SignupPage';
 import { AdminDashboard } from './pages/AdminDashboard';
 import { UserStoresPage } from './pages/UserStoresPage';
 import { StoreOwnerDashboard } from './pages/StoreOwnerDashboard';
 
-// Helper to determine role-based destination under /app
-const RoleRedirect = () => {
-  const { user } = useAuth();
-  if (!user) return <Navigate to="/login" replace />;
-  if (user.role === 'ADMIN') return <Navigate to="/app/admin" replace />;
-  if (user.role === 'STORE_OWNER') return <Navigate to="/app/owner" replace />;
-  return <Navigate to="/app/stores" replace />;
-};
-
 export const App = () => {
   const { user, isAuthenticated, loading } = useAuth();
+  const location = useLocation();
 
-  const getRoleRedirect = () => {
-    if (!user) return <Navigate to="/login" replace />;
-    if (user.role === 'ADMIN') return <Navigate to="/app/admin" replace />;
-    if (user.role === 'STORE_OWNER') return <Navigate to="/app/owner" replace />;
-    return <Navigate to="/app/stores" replace />;
+  const getRootRedirect = () => {
+    if (!isAuthenticated || !user) return <Navigate to="/login" replace />;
+    if (user.role === 'ADMIN') return <Navigate to="/admin" replace />;
+    if (user.role === 'STORE_OWNER') return <Navigate to="/owner" replace />;
+    return <Navigate to="/stores" replace />;
   };
 
   if (loading) {
@@ -41,69 +31,85 @@ export const App = () => {
     );
   }
 
+  // Show top navbar and footer only for customer stores explorer view
+  const isDashboardRoute =
+    location.pathname.startsWith('/admin') ||
+    location.pathname.startsWith('/owner') ||
+    location.pathname.startsWith('/app/admin') ||
+    location.pathname.startsWith('/app/owner');
+  const isAuthRoute = location.pathname === '/login' || location.pathname === '/signup';
+  const showTopNav = !isDashboardRoute && !isAuthRoute;
+
   return (
-    <Routes>
-      {/* Public Marketing Route: Homepage at "/" */}
-      <Route element={<PublicLayout />}>
-        <Route path="/" element={<HomePage />} />
-      </Route>
+    <div className="min-h-screen flex flex-col bg-[#FAF9F6] text-[#2B2924]">
+      {showTopNav && <Navbar />}
 
-      {/* Public Auth Routes (Redirect into /app if already logged in) */}
-      <Route
-        path="/login"
-        element={isAuthenticated ? getRoleRedirect() : <LoginPage />}
-      />
-      <Route
-        path="/signup"
-        element={isAuthenticated ? getRoleRedirect() : <SignupPage />}
-      />
+      <main className="flex-1">
+        <Routes>
+          {/* Public Authentication Routes */}
+          <Route
+            path="/login"
+            element={isAuthenticated ? getRootRedirect() : <LoginPage />}
+          />
+          <Route
+            path="/signup"
+            element={isAuthenticated ? getRootRedirect() : <SignupPage />}
+          />
 
-      {/* Authenticated / App Routes under "/app/*" */}
-      <Route
-        path="/app"
-        element={
-          <ProtectedRoute>
-            <AppLayout />
-          </ProtectedRoute>
-        }
-      >
-        {/* /app default index redirects based on user role */}
-        <Route index element={<RoleRedirect />} />
+          {/* Role-Protected Dashboards & Portals */}
+          <Route
+            path="/admin"
+            element={
+              <ProtectedRoute allowedRoles={['ADMIN']}>
+                <AdminDashboard />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/stores"
+            element={
+              <ProtectedRoute allowedRoles={['USER', 'ADMIN']}>
+                <UserStoresPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/owner"
+            element={
+              <ProtectedRoute allowedRoles={['STORE_OWNER']}>
+                <StoreOwnerDashboard />
+              </ProtectedRoute>
+            }
+          />
 
-        <Route
-          path="admin"
-          element={
-            <ProtectedRoute allowedRoles={['ADMIN']}>
-              <AdminDashboard />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="owner"
-          element={
-            <ProtectedRoute allowedRoles={['STORE_OWNER']}>
-              <StoreOwnerDashboard />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="stores"
-          element={
-            <ProtectedRoute allowedRoles={['USER', 'ADMIN']}>
-              <UserStoresPage />
-            </ProtectedRoute>
-          }
-        />
-        <Route path="*" element={<RoleRedirect />} />
-      </Route>
+          {/* Convenience aliases for /app/* */}
+          <Route path="/app/admin" element={<Navigate to="/admin" replace />} />
+          <Route path="/app/owner" element={<Navigate to="/owner" replace />} />
+          <Route path="/app/stores" element={<Navigate to="/stores" replace />} />
+          <Route path="/app" element={getRootRedirect()} />
+          <Route path="/app/*" element={getRootRedirect()} />
 
-      {/* Backward-compatibility aliases for existing bookmarks */}
-      <Route path="/admin" element={<Navigate to="/app/admin" replace />} />
-      <Route path="/owner" element={<Navigate to="/app/owner" replace />} />
-      <Route path="/stores" element={<Navigate to="/app/stores" replace />} />
+          {/* Root Redirect to Login or Role Dashboard */}
+          <Route path="/" element={getRootRedirect()} />
+          <Route path="*" element={getRootRedirect()} />
+        </Routes>
+      </main>
 
-      {/* Catch-all fallback */}
-      <Route path="*" element={<Navigate to="/" replace />} />
-    </Routes>
+      {/* Global Minimal Footer for non-dashboard views */}
+      {showTopNav && (
+        <footer className="border-t border-[#E8E5DF] bg-[#FFFFFF] py-4 text-center text-xs text-[#8A8578]">
+          <div className="max-w-6xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-2">
+            <p>© 2026 Roxx Store Rating Platform. All rights reserved.</p>
+            <div className="flex items-center gap-3 text-[#8A8578]">
+              <span>Verified ratings</span>
+              <span>•</span>
+              <span>Role permissions</span>
+              <span>•</span>
+              <span>PostgreSQL</span>
+            </div>
+          </div>
+        </footer>
+      )}
+    </div>
   );
 };

@@ -60,7 +60,7 @@ export const SignupPage = () => {
         address: address.trim(),
         password,
       });
-      navigate('/app/stores');
+      navigate('/stores');
     } catch (err) {
       setError(err.response?.data?.message || err.message || 'Registration failed. Please check the details and retry.');
     } finally {

@@ -132,10 +132,10 @@ export const Sidebar = ({ activeTab, onTabChange }) => {
               Public view
             </div>
             <Link
-              to="/app/stores"
+              to="/stores"
               onClick={() => setMobileOpen(false)}
               className={`flex items-center gap-2.5 px-5 py-2 text-[13px] transition-colors ${
-                location.pathname === '/app/stores' ? 'sidebar-active' : 'sidebar-inactive'
+                location.pathname === '/stores' ? 'sidebar-active' : 'sidebar-inactive'
               }`}
             >
               <Layers className="w-4 h-4 shrink-0" />

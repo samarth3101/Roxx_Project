@@ -21,9 +21,9 @@ export const Navbar = () => {
 
   const getDashboardLink = () => {
     if (!user) return '/login';
-    if (user.role === 'ADMIN') return '/app/admin';
-    if (user.role === 'STORE_OWNER') return '/app/owner';
-    return '/app/stores';
+    if (user.role === 'ADMIN') return '/admin';
+    if (user.role === 'STORE_OWNER') return '/owner';
+    return '/stores';
   };
 
   const hasAdminOrOwnerAccess = user?.role === 'ADMIN' || user?.role === 'STORE_OWNER';
@@ -47,7 +47,7 @@ export const Navbar = () => {
             <div className="flex items-center gap-3">
               {hasAdminOrOwnerAccess && (
                 <Link
-                  to={user.role === 'ADMIN' ? '/app/admin' : '/app/owner'}
+                  to={user.role === 'ADMIN' ? '/admin' : '/owner'}
                   className="px-2.5 py-1 text-xs text-[#8A8578] hover:text-[#1A1815] hover:bg-[#FAF9F6] rounded-[6px] transition-colors flex items-center gap-1.5"
                 >
                   <LayoutDashboard className="w-3.5 h-3.5" />
