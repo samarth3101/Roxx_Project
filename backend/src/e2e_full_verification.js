@@ -233,12 +233,12 @@ async function runE2EVerification() {
     // 4. STRICT VALIDATION & SECURITY ENFORCEMENT
     // ----------------------------------------------------
     console.log('\n--- 4. STRICT VALIDATION & SECURITY RULES ---');
-    await assertTest('Rejects Name < 20 characters', async () => {
+    await assertTest('Rejects Name < 5 characters', async () => {
       const res = await fetch(`${baseUrl}/auth/signup`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          name: 'Short',
+          name: 'Sam',
           email: 'short@test.com',
           password: 'ValidPass@123',
           address: 'Valid Address',

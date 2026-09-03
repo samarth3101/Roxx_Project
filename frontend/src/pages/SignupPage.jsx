@@ -21,7 +21,7 @@ export const SignupPage = () => {
   const [error, setError] = useState('');
 
   // Live Validations
-  const isNameValid = name.trim().length >= 20 && name.trim().length <= 60;
+  const isNameValid = name.trim().length >= 5 && name.trim().length <= 60;
   const isAddressValid = address.trim().length > 0 && address.trim().length <= 400;
   const isEmailValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim());
   const hasPassLength = password.length >= 8 && password.length <= 16;
@@ -37,7 +37,7 @@ export const SignupPage = () => {
 
     if (!isFormValid) {
       if (!isNameValid) {
-        setError('Full name must be between 20 and 60 characters long.');
+        setError('Full name must be between 5 and 60 characters long.');
       } else if (!isEmailValid) {
         setError('Please enter a valid email address.');
       } else if (!isAddressValid) {
@@ -98,7 +98,7 @@ export const SignupPage = () => {
             <div>
               <div className="flex items-center justify-between mb-1">
                 <label className="text-xs font-medium text-[#2B2924]">
-                  Full name (20 to 60 characters)
+                  Full name (5 to 60 characters)
                 </label>
                 <span
                   className={`text-[11px] tabular-nums ${
@@ -113,13 +113,13 @@ export const SignupPage = () => {
                 required
                 value={name}
                 onChange={(e) => setName(e.target.value)}
-                placeholder="e.g. Christopher Robin Customer One"
+                placeholder="e.g. Samarth Patil"
                 className="w-full craft-input"
               />
               {name.length > 0 && !isNameValid && (
                 <p className="text-[11px] text-[#C9A15A] mt-1">
-                  {name.length < 20
-                    ? `Needs ${20 - name.length} more characters (minimum 20)`
+                  {name.trim().length < 5
+                    ? `Needs ${5 - name.trim().length} more characters (minimum 5)`
                     : 'Exceeds maximum length of 60 characters'}
                 </p>
               )}

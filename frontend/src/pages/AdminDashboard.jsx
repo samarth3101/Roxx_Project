@@ -161,7 +161,7 @@ export const AdminDashboard = () => {
   };
 
   // Add User Validation
-  const isUserNameValid = newUserData.name.trim().length >= 20 && newUserData.name.trim().length <= 60;
+  const isUserNameValid = newUserData.name.trim().length >= 5 && newUserData.name.trim().length <= 60;
   const isUserAddressValid = newUserData.address.trim().length > 0 && newUserData.address.trim().length <= 400;
   const isUserEmailValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(newUserData.email.trim());
   const hasUserPassLength = newUserData.password.length >= 8 && newUserData.password.length <= 16;
@@ -170,7 +170,7 @@ export const AdminDashboard = () => {
   const isUserFormValid = isUserNameValid && isUserAddressValid && isUserEmailValid && hasUserPassLength && hasUserPassUpper && hasUserPassSpecial;
 
   // Add Store Validation
-  const isStoreNameValid = newStoreData.name.trim().length >= 20 && newStoreData.name.trim().length <= 60;
+  const isStoreNameValid = newStoreData.name.trim().length >= 5 && newStoreData.name.trim().length <= 60;
   const isStoreAddressValid = newStoreData.address.trim().length > 0 && newStoreData.address.trim().length <= 400;
   const isStoreEmailValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(newStoreData.email.trim());
   const isStoreFormValid = isStoreNameValid && isStoreAddressValid && isStoreEmailValid && !!newStoreData.ownerId;
@@ -180,7 +180,7 @@ export const AdminDashboard = () => {
     setAddUserError('');
     if (!isUserFormValid) {
       if (!isUserNameValid) {
-        setAddUserError(`Name must be between 20 and 60 characters. You entered ${newUserData.name.trim().length} characters.`);
+        setAddUserError(`Name must be between 5 and 60 characters. You entered ${newUserData.name.trim().length} characters.`);
       } else if (!isUserEmailValid) {
         setAddUserError('Please enter a valid email address.');
       } else if (!isUserAddressValid) {
@@ -217,7 +217,7 @@ export const AdminDashboard = () => {
     setAddStoreError('');
     if (!isStoreFormValid) {
       if (!isStoreNameValid) {
-        setAddStoreError(`Store name must be between 20 and 60 characters. Currently ${newStoreData.name.trim().length} characters.`);
+        setAddStoreError(`Store name must be between 5 and 60 characters. Currently ${newStoreData.name.trim().length} characters.`);
       } else if (!isStoreEmailValid) {
         setAddStoreError('Please enter a valid email address.');
       } else if (!isStoreAddressValid) {
@@ -593,7 +593,7 @@ export const AdminDashboard = () => {
           <div>
             <div className="flex justify-between items-center mb-1">
               <label className="text-xs font-medium text-[#2B2924]">
-                Full name (20 to 60 characters)
+                Full name (5 to 60 characters)
               </label>
               <span
                 className={`text-[11px] tabular-nums ${
@@ -612,13 +612,13 @@ export const AdminDashboard = () => {
               required
               value={newUserData.name}
               onChange={(e) => setNewUserData({ ...newUserData, name: e.target.value })}
-              placeholder="e.g. Alexander James Store Owner 1"
+              placeholder="e.g. Samarth Patil"
               className="w-full craft-input"
             />
             {newUserData.name.length > 0 && !isUserNameValid && (
               <p className="text-[11px] text-[#C9A15A] mt-1">
-                {newUserData.name.trim().length < 20
-                  ? `Needs ${20 - newUserData.name.trim().length} more characters (minimum 20 characters required)`
+                {newUserData.name.trim().length < 5
+                  ? `Needs ${5 - newUserData.name.trim().length} more characters (minimum 5 characters required)`
                   : 'Exceeds maximum length of 60 characters'}
               </p>
             )}
@@ -754,7 +754,7 @@ export const AdminDashboard = () => {
           <div>
             <div className="flex justify-between items-center mb-1">
               <label className="text-xs font-medium text-[#2B2924]">
-                Store name (20 to 60 characters)
+                Store name (5 to 60 characters)
               </label>
               <span
                 className={`text-[11px] tabular-nums ${
@@ -773,13 +773,13 @@ export const AdminDashboard = () => {
               required
               value={newStoreData.name}
               onChange={(e) => setNewStoreData({ ...newStoreData, name: e.target.value })}
-              placeholder="e.g. Apex Grand Artisan Emporium"
+              placeholder="e.g. Apex Artisan Goods"
               className="w-full craft-input"
             />
             {newStoreData.name.length > 0 && !isStoreNameValid && (
               <p className="text-[11px] text-[#C9A15A] mt-1">
-                {newStoreData.name.trim().length < 20
-                  ? `Needs ${20 - newStoreData.name.trim().length} more characters (minimum 20 characters required)`
+                {newStoreData.name.trim().length < 5
+                  ? `Needs ${5 - newStoreData.name.trim().length} more characters (minimum 5 characters required)`
                   : 'Exceeds maximum length of 60 characters'}
               </p>
             )}

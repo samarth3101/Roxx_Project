@@ -6,7 +6,7 @@ export const signupSchema = z.object({
   name: z
     .string({ required_error: 'Name is required' })
     .trim()
-    .min(20, 'Name must be at least 20 characters long')
+    .min(5, 'Name must be at least 5 characters long')
     .max(60, 'Name cannot exceed 60 characters'),
   email: z
     .string({ required_error: 'Email is required' })
@@ -57,7 +57,7 @@ export const createUserByAdminSchema = z.object({
   name: z
     .string({ required_error: 'Name is required' })
     .trim()
-    .min(20, 'Name must be at least 20 characters long')
+    .min(5, 'Name must be at least 5 characters long')
     .max(60, 'Name cannot exceed 60 characters'),
   email: z
     .string({ required_error: 'Email is required' })
