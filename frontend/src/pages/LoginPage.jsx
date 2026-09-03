@@ -20,11 +20,11 @@ export const LoginPage = () => {
     try {
       const loggedInUser = await login(email, password);
       if (loggedInUser.role === 'ADMIN') {
-        navigate('/admin');
+        navigate('/app/admin');
       } else if (loggedInUser.role === 'STORE_OWNER') {
-        navigate('/owner');
+        navigate('/app/owner');
       } else {
-        navigate('/stores');
+        navigate('/app/stores');
       }
     } catch (err) {
       setError(err.response?.data?.message || err.message || 'Incorrect email or password. Please try again.');

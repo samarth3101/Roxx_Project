@@ -7,10 +7,10 @@ export const ProtectedRoute = ({ children, allowedRoles = [] }) => {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-slate-950">
-        <div className="flex flex-col items-center gap-3 text-slate-400">
-          <div className="w-10 h-10 border-3 border-indigo-500 border-t-transparent rounded-full animate-spin"></div>
-          <p className="text-sm">Verifying authentication session...</p>
+      <div className="min-h-screen flex items-center justify-center bg-[#FAF9F6]">
+        <div className="flex flex-col items-center gap-2 text-[#8A8578]">
+          <div className="w-5 h-5 border-2 border-[#C9714F] border-t-transparent rounded-full animate-spin"></div>
+          <p className="text-xs">Verifying session...</p>
         </div>
       </div>
     );
@@ -21,10 +21,10 @@ export const ProtectedRoute = ({ children, allowedRoles = [] }) => {
   }
 
   if (allowedRoles.length > 0 && !allowedRoles.includes(user.role)) {
-    // Redirect to respective role dashboard
-    if (user.role === 'ADMIN') return <Navigate to="/admin" replace />;
-    if (user.role === 'STORE_OWNER') return <Navigate to="/owner" replace />;
-    return <Navigate to="/stores" replace />;
+    // Redirect to respective role dashboard under /app
+    if (user.role === 'ADMIN') return <Navigate to="/app/admin" replace />;
+    if (user.role === 'STORE_OWNER') return <Navigate to="/app/owner" replace />;
+    return <Navigate to="/app/stores" replace />;
   }
 
   return children;
