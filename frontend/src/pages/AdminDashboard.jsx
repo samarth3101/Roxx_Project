@@ -206,7 +206,12 @@ export const AdminDashboard = () => {
         fetchAvailableOwners();
       }
     } catch (err) {
-      setAddUserError(err.response?.data?.message || err.message || 'Failed to create user');
+      const serverMsg =
+        err.response?.data?.errors?.map((e) => e.message).join('; ') ||
+        err.response?.data?.message ||
+        err.message ||
+        'Failed to create user';
+      setAddUserError(serverMsg);
     } finally {
       setAddUserLoading(false);
     }
@@ -240,7 +245,12 @@ export const AdminDashboard = () => {
         fetchAvailableOwners();
       }
     } catch (err) {
-      setAddStoreError(err.response?.data?.message || err.message || 'Failed to create store');
+      const serverMsg =
+        err.response?.data?.errors?.map((e) => e.message).join('; ') ||
+        err.response?.data?.message ||
+        err.message ||
+        'Failed to create store';
+      setAddStoreError(serverMsg);
     } finally {
       setAddStoreLoading(false);
     }

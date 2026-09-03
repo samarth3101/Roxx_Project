@@ -11,9 +11,14 @@ export const errorHandler = (err, req, res, next) => {
       message: e.message,
     }));
 
+    const primaryMessage =
+      formattedErrors.length > 0
+        ? formattedErrors.map((e) => e.message).join('; ')
+        : 'Validation failed';
+
     return res.status(400).json({
       success: false,
-      message: 'Validation failed',
+      message: primaryMessage,
       errors: formattedErrors,
     });
   }
