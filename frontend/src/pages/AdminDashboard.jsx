@@ -14,6 +14,8 @@ import {
   Filter,
   Eye,
   AlertCircle,
+  Check,
+  X,
 } from 'lucide-react';
 
 export const AdminDashboard = () => {
@@ -177,10 +179,18 @@ export const AdminDashboard = () => {
     e.preventDefault();
     setAddUserError('');
     if (!isUserFormValid) {
-      if (!isUserNameValid) setAddUserError('Name must be 20 to 60 characters.');
-      else if (!isUserEmailValid) setAddUserError('Please enter a valid email address.');
-      else if (!hasUserPassLength || !hasUserPassUpper || !hasUserPassSpecial) {
-        setAddUserError('Password needs 8-16 characters, 1 uppercase letter, and 1 special character.');
+      if (!isUserNameValid) {
+        setAddUserError(`Name must be between 20 and 60 characters. You entered ${newUserData.name.trim().length} characters.`);
+      } else if (!isUserEmailValid) {
+        setAddUserError('Please enter a valid email address.');
+      } else if (!isUserAddressValid) {
+        setAddUserError('Address is required and must be under 400 characters.');
+      } else if (!hasUserPassLength) {
+        setAddUserError(`Password must be between 8 and 16 characters (currently ${newUserData.password.length}).`);
+      } else if (!hasUserPassUpper) {
+        setAddUserError('Password needs at least one uppercase letter (A-Z).');
+      } else if (!hasUserPassSpecial) {
+        setAddUserError('Password needs at least one special character (!@#$%^&*...).');
       }
       return;
     }
@@ -206,7 +216,15 @@ export const AdminDashboard = () => {
     e.preventDefault();
     setAddStoreError('');
     if (!isStoreFormValid) {
-      setAddStoreError('Please fill out all store fields and select an owner.');
+      if (!isStoreNameValid) {
+        setAddStoreError(`Store name must be between 20 and 60 characters. Currently ${newStoreData.name.trim().length} characters.`);
+      } else if (!isStoreEmailValid) {
+        setAddStoreError('Please enter a valid email address.');
+      } else if (!isStoreAddressValid) {
+        setAddStoreError('Store address is required and must be under 400 characters.');
+      } else if (!newStoreData.ownerId) {
+        setAddStoreError('Please assign a store owner.');
+      }
       return;
     }
 
@@ -577,7 +595,17 @@ export const AdminDashboard = () => {
               <label className="text-xs font-medium text-[#2B2924]">
                 Full name (20 to 60 characters)
               </label>
-              <span className="text-[11px] tabular-nums text-[#8A8578]">{newUserData.name.length}/60</span>
+              <span
+                className={`text-[11px] tabular-nums ${
+                  isUserNameValid
+                    ? 'text-[#6B8F6B] font-medium'
+                    : newUserData.name.length > 0
+                    ? 'text-[#C9A15A]'
+                    : 'text-[#8A8578]'
+                }`}
+              >
+                {newUserData.name.length}/60
+              </span>
             </div>
             <input
               type="text"
@@ -587,6 +615,13 @@ export const AdminDashboard = () => {
               placeholder="e.g. Alexander James Store Owner 1"
               className="w-full craft-input"
             />
+            {newUserData.name.length > 0 && !isUserNameValid && (
+              <p className="text-[11px] text-[#C9A15A] mt-1">
+                {newUserData.name.trim().length < 20
+                  ? `Needs ${20 - newUserData.name.trim().length} more characters (minimum 20 characters required)`
+                  : 'Exceeds maximum length of 60 characters'}
+              </p>
+            )}
           </div>
 
           <div>
@@ -634,7 +669,7 @@ export const AdminDashboard = () => {
 
           <div>
             <label className="block text-xs font-medium text-[#2B2924] mb-1">
-              Password (8 to 16 characters, 1 uppercase, 1 special character)
+              Password (8 to 16 characters)
             </label>
             <input
               type="password"
@@ -646,6 +681,42 @@ export const AdminDashboard = () => {
             />
           </div>
 
+          {/* Real-time Password Requirements Checklist */}
+          {newUserData.password.length > 0 && (
+            <div className="p-2.5 bg-[#FAF9F6] rounded-[8px] border border-[#E8E5DF] space-y-1 text-xs">
+              <div className="flex items-center gap-2">
+                {hasUserPassLength ? (
+                  <Check className="w-3.5 h-3.5 text-[#6B8F6B]" />
+                ) : (
+                  <X className="w-3.5 h-3.5 text-[#8A8578]" />
+                )}
+                <span className={hasUserPassLength ? 'text-[#6B8F6B] font-medium' : 'text-[#8A8578]'}>
+                  8 to 16 characters
+                </span>
+              </div>
+              <div className="flex items-center gap-2">
+                {hasUserPassUpper ? (
+                  <Check className="w-3.5 h-3.5 text-[#6B8F6B]" />
+                ) : (
+                  <X className="w-3.5 h-3.5 text-[#8A8578]" />
+                )}
+                <span className={hasUserPassUpper ? 'text-[#6B8F6B] font-medium' : 'text-[#8A8578]'}>
+                  At least 1 uppercase letter (A-Z)
+                </span>
+              </div>
+              <div className="flex items-center gap-2">
+                {hasUserPassSpecial ? (
+                  <Check className="w-3.5 h-3.5 text-[#6B8F6B]" />
+                ) : (
+                  <X className="w-3.5 h-3.5 text-[#8A8578]" />
+                )}
+                <span className={hasUserPassSpecial ? 'text-[#6B8F6B] font-medium' : 'text-[#8A8578]'}>
+                  At least 1 special character (!@#$%^&*...)
+                </span>
+              </div>
+            </div>
+          )}
+
           <div className="flex items-center justify-end gap-2 pt-2">
             <button
               type="button"
@@ -656,7 +727,7 @@ export const AdminDashboard = () => {
             </button>
             <button
               type="submit"
-              disabled={!isUserFormValid || addUserLoading}
+              disabled={addUserLoading}
               className="btn-primary text-xs py-1.5 px-3.5"
             >
               {addUserLoading ? 'Creating...' : 'Create user'}
@@ -685,7 +756,17 @@ export const AdminDashboard = () => {
               <label className="text-xs font-medium text-[#2B2924]">
                 Store name (20 to 60 characters)
               </label>
-              <span className="text-[11px] tabular-nums text-[#8A8578]">{newStoreData.name.length}/60</span>
+              <span
+                className={`text-[11px] tabular-nums ${
+                  isStoreNameValid
+                    ? 'text-[#6B8F6B] font-medium'
+                    : newStoreData.name.length > 0
+                    ? 'text-[#C9A15A]'
+                    : 'text-[#8A8578]'
+                }`}
+              >
+                {newStoreData.name.length}/60
+              </span>
             </div>
             <input
               type="text"
@@ -695,6 +776,13 @@ export const AdminDashboard = () => {
               placeholder="e.g. Apex Grand Artisan Emporium"
               className="w-full craft-input"
             />
+            {newStoreData.name.length > 0 && !isStoreNameValid && (
+              <p className="text-[11px] text-[#C9A15A] mt-1">
+                {newStoreData.name.trim().length < 20
+                  ? `Needs ${20 - newStoreData.name.trim().length} more characters (minimum 20 characters required)`
+                  : 'Exceeds maximum length of 60 characters'}
+              </p>
+            )}
           </div>
 
           <div>
@@ -760,7 +848,7 @@ export const AdminDashboard = () => {
             </button>
             <button
               type="submit"
-              disabled={!isStoreFormValid || addStoreLoading}
+              disabled={addStoreLoading}
               className="btn-primary text-xs py-1.5 px-3.5"
             >
               {addStoreLoading ? 'Registering...' : 'Register store'}

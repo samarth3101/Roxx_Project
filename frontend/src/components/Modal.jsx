@@ -31,11 +31,13 @@ export const Modal = ({ isOpen, onClose, title, children, maxWidth = 'max-w-md' 
         className={`relative w-full ${maxWidth} bg-[#FFFFFF] border border-[#E8E5DF] rounded-[8px] shadow-dropdown p-6 z-10 transition-all duration-150`}
       >
         <div className="flex items-center justify-between pb-3 border-b border-[#E8E5DF]">
-          <h3 className="text-base font-semibold text-[#1A1815]">{title}</h3>
+          <h3 className="text-base font-semibold text-[#1A1815]" style={{ color: '#1A1815' }}>
+            {title}
+          </h3>
           <button
             type="button"
             onClick={onClose}
-            className="p-1 text-[#8A8578] hover:text-[#1A1815] rounded-[6px] hover:bg-[#FAF9F6] transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[#4A6FA5]"
+            className="p-1 text-[#2B2924] hover:text-[#1A1815] rounded-[6px] hover:bg-[#FAF9F6] transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[#4A6FA5]"
             aria-label="Close dialog"
           >
             <X className="w-4 h-4" />
